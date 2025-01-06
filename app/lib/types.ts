@@ -1,5 +1,6 @@
 export type RecentTransaction = {
     transactionId: number;
+    name: string;
     amount: number;
     category: string;
     description: string;
