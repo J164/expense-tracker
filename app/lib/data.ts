@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { User } from "./definitions";
+import { Category, User } from "./definitions";
 import { CardData, FilteredTransaction, RecentTransaction } from "./types";
 
 export async function fetchUser(userId: number) {
@@ -92,13 +92,23 @@ export async function fetchTransactionsPages(query: string) {
             FROM Transactions t
             WHERE
                 t.name ILIKE ${`%${query}%`} OR
-                t.description ILIKE ${`%${query}%`}
-    `;
+                t.description ILIKE ${`%${query}%`}`;
 
         const totalPages = Math.ceil(
             Number(count.rows[0].count) / ITEMS_PER_PAGE
         );
         return totalPages;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch total number of transactions.");
+    }
+}
+
+export async function fetchCategories(userId: number) {
+    try {
+        const data = await sql<Category>`
+            SELECT * FROM Categories WHERE id = ${userId}`;
+        return data.rows;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch total number of transactions.");
