@@ -4,12 +4,22 @@ export type RecentTransaction = {
     amount: string;
     category: string;
     description: string;
-    purchaseDate: string;
-    createdAt: string;
+    purchase_date: string;
+    created_at: string;
 };
 
 export type CardData = {
     budget: string;
     total_spent: string;
     remaining_budget: string;
+};
+
+export type FilteredTransaction = {
+    id: number;
+    name: string;
+    amount: string;
+    category: string;
+    description: string;
+    purchase_date: string;
+    created_at: string;
 };

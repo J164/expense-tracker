@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 import { User } from "./definitions";
-import { CardData, RecentTransaction } from "./types";
+import { CardData, FilteredTransaction, RecentTransaction } from "./types";
 
 export async function fetchUser(userId: number) {
     try {
@@ -52,5 +52,55 @@ export async function fetchRecentTransactions(userId: number) {
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch recent transactions.");
+    }
+}
+
+const ITEMS_PER_PAGE = 15;
+export async function fetchFilteredTransactions(
+    query: string,
+    currentPage: number
+) {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+    try {
+        const invoices = await sql<FilteredTransaction>`
+            SELECT 
+                t.id,
+                t.name,
+                t.amount,
+                t.category,
+                t.description,
+                t.purchase_date,
+                t.created_at
+            FROM Transactions t
+            WHERE
+                t.name ILIKE ${`%${query}%`} OR
+                t.description ILIKE ${`%${query}%`}
+            ORDER BY t.purchase_date DESC, t.created_at DESC
+            LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
+
+        return invoices.rows;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch transactions.");
+    }
+}
+
+export async function fetchTransactionsPages(query: string) {
+    try {
+        const count = await sql`SELECT COUNT(*)
+            FROM Transactions t
+            WHERE
+                t.name ILIKE ${`%${query}%`} OR
+                t.description ILIKE ${`%${query}%`}
+    `;
+
+        const totalPages = Math.ceil(
+            Number(count.rows[0].count) / ITEMS_PER_PAGE
+        );
+        return totalPages;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch total number of transactions.");
     }
 }
