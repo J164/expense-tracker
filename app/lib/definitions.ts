@@ -1,4 +1,4 @@
-// index on purchase_date, user_id, category in Purchase table
+// @TODO index on purchase_date, user_id, category in Purchase table
 
 export type User = {
     id: number;

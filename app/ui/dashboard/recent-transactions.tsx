@@ -1,14 +1,16 @@
-import { RecentTransaction } from "@/app/lib/types";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { lusitana } from "./fonts";
 import Link from "next/link";
+import { fetchRecentTransactions } from "@/app/lib/data";
 
 export default async function RecentTransactions({
-    transactions
+    userId
 }: {
-    transactions: RecentTransaction[];
+    userId: number;
 }) {
+    const transactions = await fetchRecentTransactions(userId);
+
     return (
         <div className="flex w-full flex-col md:col-span-4">
             <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
@@ -19,7 +21,7 @@ export default async function RecentTransactions({
                     {transactions.map((transaction, i) => {
                         return (
                             <div
-                                key={transaction.transactionId}
+                                key={transaction.id}
                                 className={clsx(
                                     "flex flex-row items-center justify-between py-4",
                                     {
@@ -40,7 +42,7 @@ export default async function RecentTransactions({
                                 <p
                                     className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
                                 >
-                                    ${transaction.amount.toFixed(2)}
+                                    ${transaction.amount}
                                 </p>
                             </div>
                         );

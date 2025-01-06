@@ -1,22 +1,15 @@
 export type RecentTransaction = {
-    transactionId: number;
+    id: number;
     name: string;
-    amount: number;
+    amount: string;
     category: string;
     description: string;
     purchaseDate: string;
     createdAt: string;
 };
 
-export type CategorySpending = {
-    category: string;
-    totalSpentInCategory: number;
-};
-
-export type DashboardData = {
+export type CardData = {
     budget: string;
     total_spent: string;
     remaining_budget: string;
-    recent_transactions: RecentTransaction[];
-    category_spending: CategorySpending[];
 };
