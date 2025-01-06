@@ -13,9 +13,9 @@ export type CategorySpending = {
 };
 
 export type DashboardData = {
-    budget: number;
-    totalSpent: number;
-    remainingBudget: number;
-    recentTransactions: RecentTransaction[];
-    categorySpending: CategorySpending[];
+    budget: string;
+    total_spent: string;
+    remaining_budget: string;
+    recent_transactions: RecentTransaction[];
+    category_spending: CategorySpending[];
 };
