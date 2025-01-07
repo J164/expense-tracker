@@ -9,7 +9,8 @@
         "lint": "next lint",
         "format": "npx prettier . --write",
         "prisma:generate": "prisma generate",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "postinstall": "prisma generate"
     },
     "dependencies": {
         "@heroicons/react": "^2.2.0",
