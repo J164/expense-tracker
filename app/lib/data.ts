@@ -63,7 +63,7 @@ export async function fetchFilteredTransactions(
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const invoices = await sql<FilteredTransaction>`
+        const transactions = await sql<FilteredTransaction>`
             SELECT 
                 t.id,
                 t.name,
@@ -79,7 +79,7 @@ export async function fetchFilteredTransactions(
             ORDER BY t.purchase_date DESC, t.created_at DESC
             LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
 
-        return invoices.rows;
+        return transactions.rows;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch transactions.");
