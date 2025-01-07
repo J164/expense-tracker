@@ -33,13 +33,15 @@ export default async function TransactionsTable({
                                         </div>
                                     </div>
                                     <p className="text-xl font-medium">
-                                        ${transaction.amount}
+                                        ${transaction.amount.toFixed(2)}
                                     </p>
                                 </div>
                                 <div className="flex w-full items-center justify-between pt-2">
                                     <p className="text-gray-500">
                                         {formatDateToLocal(
                                             transaction.created_at
+                                                .toISOString()
+                                                .split("T")[0]
                                         )}
                                     </p>
                                     <div className="flex justify-end gap-2">
@@ -99,10 +101,12 @@ export default async function TransactionsTable({
                                     <td className="whitespace-nowrap px-3 py-3">
                                         {formatDateToLocal(
                                             transaction.created_at
+                                                .toISOString()
+                                                .split("T")[0]
                                         )}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        ${transaction.amount}
+                                        ${transaction.amount.toFixed(2)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
                                         {transaction.category}

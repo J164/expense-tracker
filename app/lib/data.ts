@@ -1,11 +1,12 @@
-import { sql } from "@vercel/postgres";
-import { Category, User } from "./definitions";
-import { CardData, FilteredTransaction, RecentTransaction } from "./types";
+import { Decimal } from "@prisma/client/runtime/library";
+import { prisma } from "./prisma";
 
 export async function fetchUser(userId: number) {
     try {
-        const data = await sql<User>`SELECT * FROM Users WHERE id = ${userId}`;
-        return data.rows;
+        const data = await prisma.users.findUniqueOrThrow({
+            where: { id: userId }
+        });
+        return data;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch user.");
@@ -13,18 +14,45 @@ export async function fetchUser(userId: number) {
 }
 
 export async function fetchCardData(userId: number) {
-    try {
-        const data = await sql<CardData>`
-            SELECT 
-                ms.user_id,
-                ms.budget,
-                ms.total_spent,
-                (ms.budget - ms.total_spent) AS remaining_budget
-            FROM Monthly_Summary ms
-            WHERE ms.user_id = ${userId}
-                AND DATE_TRUNC('month', ms.month) = DATE_TRUNC('month', CURRENT_DATE)`;
+    const currentMonth = new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        1
+    );
 
-        return data.rows[0];
+    try {
+        const data = await prisma.monthly_summary.findFirst({
+            where: {
+                user_id: userId,
+                month: {
+                    gte: currentMonth,
+                    lt: new Date(
+                        new Date(currentMonth).setMonth(
+                            currentMonth.getMonth() + 1
+                        )
+                    )
+                }
+            },
+            select: {
+                user_id: true,
+                budget: true,
+                total_spent: true
+            }
+        });
+
+        if (!data) {
+            const data = await prisma.users.findUniqueOrThrow({
+                where: { id: userId },
+                select: { default_budget: true }
+            });
+            return {
+                user_id: userId,
+                total_spent: new Decimal(0),
+                budget: data.default_budget
+            };
+        }
+
+        return data;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch card data.");
@@ -32,23 +60,29 @@ export async function fetchCardData(userId: number) {
 }
 
 export async function fetchRecentTransactions(userId: number) {
-    try {
-        const data = await sql<RecentTransaction>`
-            SELECT 
-                t.id,
-                t.name,
-                t.amount,
-                t.category,
-                t.description,
-                t.purchase_date,
-                t.created_at
-            FROM Transactions t
-            WHERE t.user_id = ${userId}
-                AND DATE_TRUNC('month', t.purchase_date) = DATE_TRUNC('month', CURRENT_DATE)
-            ORDER BY t.purchase_date DESC, t.created_at DESC
-            LIMIT 10`;
+    const currentMonth = new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        1
+    );
 
-        return data.rows;
+    try {
+        const data = await prisma.transactions.findMany({
+            where: {
+                user_id: userId,
+                purchase_date: {
+                    gte: currentMonth,
+                    lt: new Date(
+                        new Date(currentMonth).setMonth(
+                            currentMonth.getMonth() + 1
+                        )
+                    )
+                }
+            },
+            orderBy: [{ purchase_date: "desc" }, { created_at: "desc" }],
+            take: 10
+        });
+        return data;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch recent transactions.");
@@ -63,23 +97,15 @@ export async function fetchFilteredTransactions(
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const transactions = await sql<FilteredTransaction>`
-            SELECT 
-                t.id,
-                t.name,
-                t.amount,
-                t.category,
-                t.description,
-                t.purchase_date,
-                t.created_at
-            FROM Transactions t
-            WHERE
-                t.name ILIKE ${`%${query}%`} OR
-                t.description ILIKE ${`%${query}%`}
-            ORDER BY t.purchase_date DESC, t.created_at DESC
-            LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}`;
-
-        return transactions.rows;
+        const data = await prisma.transactions.findMany({
+            where: {
+                name: { contains: query, mode: "insensitive" }
+            },
+            orderBy: [{ purchase_date: "desc" }, { created_at: "desc" }],
+            take: ITEMS_PER_PAGE,
+            skip: offset
+        });
+        return data;
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch transactions.");
@@ -88,27 +114,12 @@ export async function fetchFilteredTransactions(
 
 export async function fetchTransactionsPages(query: string) {
     try {
-        const count = await sql`SELECT COUNT(*)
-            FROM Transactions t
-            WHERE
-                t.name ILIKE ${`%${query}%`} OR
-                t.description ILIKE ${`%${query}%`}`;
-
-        const totalPages = Math.ceil(
-            Number(count.rows[0].count) / ITEMS_PER_PAGE
-        );
-        return totalPages;
-    } catch (error) {
-        console.error("Database Error:", error);
-        throw new Error("Failed to fetch total number of transactions.");
-    }
-}
-
-export async function fetchCategories(userId: number) {
-    try {
-        const data = await sql<Category>`
-            SELECT * FROM Categories WHERE id = ${userId}`;
-        return data.rows;
+        const count = await prisma.transactions.count({
+            where: {
+                name: { contains: query, mode: "insensitive" }
+            }
+        });
+        return Math.ceil(count / ITEMS_PER_PAGE);
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch total number of transactions.");

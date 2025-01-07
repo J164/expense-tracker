@@ -1,9 +1,9 @@
 "use server";
 
-import { sql } from "@vercel/postgres";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { prisma } from "./prisma";
 
 const CreateTransactionSchema = z.object({
     name: z.string(),
@@ -20,9 +20,16 @@ export async function createTransaction(userId: number, formData: FormData) {
         category: formData.get("category")
     });
 
-    await sql`
-        INSERT INTO Transactions (user_id, amount, category, purchase_date, name, created_at)
-        VALUES (${userId}, ${amount}, ${category}, ${date}, ${name}, CURRENT_TIMESTAMP)`;
+    await prisma.transactions.create({
+        data: {
+            user_id: userId,
+            amount,
+            category,
+            purchase_date: new Date(date),
+            name,
+            created_at: new Date()
+        }
+    });
 
     revalidatePath("/dashboard/transactions");
     redirect("/dashboard/transactions");

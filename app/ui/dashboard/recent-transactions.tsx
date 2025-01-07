@@ -42,7 +42,7 @@ export default async function RecentTransactions({
                                 <p
                                     className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
                                 >
-                                    ${transaction.amount}
+                                    ${transaction.amount.toFixed(2)}
                                 </p>
                             </div>
                         );

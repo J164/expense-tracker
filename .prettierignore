@@ -3,6 +3,7 @@
 **/.next
 **/.husky
 public/*
+prisma/*
 LICENSE
 .prettierignore
 .gitignore

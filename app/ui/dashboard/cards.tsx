@@ -21,7 +21,7 @@ export function Card({
 }
 
 export async function CardWrapper({ userId }: { userId: number }) {
-    const { remaining_budget, budget } = await fetchCardData(userId);
+    const { total_spent, budget } = await fetchCardData(userId);
 
     return (
         <>
@@ -30,8 +30,8 @@ export async function CardWrapper({ userId }: { userId: number }) {
                     className={`${lusitana.className}
                             truncate rounded-xl bg-white px-4 py-8 text-center text-2xl`}
                 >
-                    {`$${remaining_budget}`}{" "}
-                    <span className="text-gray-500">{`/ $${budget}`}</span>
+                    {`$${budget.minus(total_spent).toFixed(2)}`}{" "}
+                    <span className="text-gray-500">{`/ $${budget.toFixed(2)}`}</span>
                 </p>
             </Card>
         </>

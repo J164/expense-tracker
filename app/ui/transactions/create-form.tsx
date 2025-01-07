@@ -6,20 +6,9 @@ import {
     IdentificationIcon
 } from "@heroicons/react/24/outline";
 import { Button } from "../button";
-import { fetchCategories } from "@/app/lib/data";
-import { Suspense } from "react";
 import { createTransaction } from "@/app/lib/actions";
 
 const defaultCategories = ["Dining", "Entertainment"];
-
-async function CategoryOptions() {
-    const categories = await fetchCategories(1);
-    return categories.map(category => (
-        <option key={category.id} value={category.id}>
-            {category.name}
-        </option>
-    ));
-}
 
 export default async function Form() {
     return (
@@ -112,9 +101,6 @@ export default async function Form() {
                                     {category}
                                 </option>
                             ))}
-                            <Suspense>
-                                <CategoryOptions />
-                            </Suspense>
                         </select>
                         <ArchiveBoxArrowDownIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
                     </div>
