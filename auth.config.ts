@@ -1,4 +1,5 @@
 import { NextAuthConfig } from "next-auth";
+import Google from "next-auth/providers/google";
 
 export const authConfig = {
     pages: {
@@ -7,15 +8,16 @@ export const authConfig = {
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth;
-            const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-            if (isOnDashboard) {
-                if (isLoggedIn) return true;
-                return false;
-            } else if (isLoggedIn) {
+            if (nextUrl.pathname.startsWith("/dashboard")) {
+                return isLoggedIn;
+            }
+
+            if (isLoggedIn) {
                 return Response.redirect(new URL("/dashboard", nextUrl));
             }
+
             return true;
         }
     },
-    providers: []
+    providers: [Google]
 } satisfies NextAuthConfig;
