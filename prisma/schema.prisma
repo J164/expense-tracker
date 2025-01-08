@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -7,40 +8,103 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model monthly_summary {
+model MonthlySummary {
   id          Int       @id @default(autoincrement())
-  user_id     Int
+  user_id     String
   month       DateTime  @db.Date
   total_spent Decimal   @db.Decimal(10, 2)
   created_at  DateTime  @default(now()) @db.Timestamp(6)
   budget      Decimal   @default(0.00) @db.Decimal(10, 2)
-  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([user_id, month])
 }
 
-model transactions {
-  id            Int       @id(map: "purchases_pkey") @default(autoincrement())
-  user_id       Int
+model Transaction {
+  id            Int       @id @default(autoincrement())
+  user_id       String
   amount        Decimal   @db.Decimal(10, 2)
   category      String?   @db.VarChar(255)
   purchase_date DateTime  @db.Date
   created_at    DateTime  @default(now()) @db.Timestamp(6)
   name          String    @db.VarChar(255)
-  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "purchases_user_id_fkey")
+  users         User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "purchases_user_id_fkey")
 
   @@index([user_id, purchase_date])
   @@index([user_id, category])
   @@index([user_id, name])
 }
+ 
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-model users {
-  id              Int               @id @default(autoincrement())
-  email           String            @unique @db.VarChar(255)
-  password_hash   String
-  name            String?           @db.VarChar(255)
-  created_at      DateTime          @default(now()) @db.Timestamp(6)
-  default_budget  Decimal           @default(0.00) @db.Decimal(10, 2)
-  monthly_summary monthly_summary[]
-  transactions    transactions[]
+  default_budget        Decimal           @default(0.00) @db.Decimal(10, 2)
+  monthly_summary       MonthlySummary[]
+  transactions          Transaction[]
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([userId, credentialID])
 }

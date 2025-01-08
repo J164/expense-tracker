@@ -1,9 +1,13 @@
+"use server";
+
 import { Decimal } from "@prisma/client/runtime/library";
 import { prisma } from "./prisma";
+import { getUserId } from "./utils";
 
-export async function fetchUser(userId: number) {
+export async function fetchUser() {
     try {
-        const data = await prisma.users.findUniqueOrThrow({
+        const userId = await getUserId();
+        const data = await prisma.user.findUniqueOrThrow({
             where: { id: userId }
         });
         return data;
@@ -13,7 +17,7 @@ export async function fetchUser(userId: number) {
     }
 }
 
-export async function fetchCardData(userId: number) {
+export async function fetchCardData() {
     const currentMonth = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -21,7 +25,8 @@ export async function fetchCardData(userId: number) {
     );
 
     try {
-        const data = await prisma.monthly_summary.findFirst({
+        const userId = await getUserId();
+        const data = await prisma.monthlySummary.findFirst({
             where: {
                 user_id: userId,
                 month: {
@@ -41,7 +46,7 @@ export async function fetchCardData(userId: number) {
         });
 
         if (!data) {
-            const data = await prisma.users.findUniqueOrThrow({
+            const data = await prisma.user.findUniqueOrThrow({
                 where: { id: userId },
                 select: { default_budget: true }
             });
@@ -59,7 +64,7 @@ export async function fetchCardData(userId: number) {
     }
 }
 
-export async function fetchRecentTransactions(userId: number) {
+export async function fetchRecentTransactions() {
     const currentMonth = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -67,7 +72,8 @@ export async function fetchRecentTransactions(userId: number) {
     );
 
     try {
-        const data = await prisma.transactions.findMany({
+        const userId = await getUserId();
+        const data = await prisma.transaction.findMany({
             where: {
                 user_id: userId,
                 purchase_date: {
@@ -97,8 +103,10 @@ export async function fetchFilteredTransactions(
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        const data = await prisma.transactions.findMany({
+        const userId = await getUserId();
+        const data = await prisma.transaction.findMany({
             where: {
+                user_id: userId,
                 name: { contains: query, mode: "insensitive" }
             },
             orderBy: [{ purchase_date: "desc" }, { created_at: "desc" }],
@@ -114,8 +122,10 @@ export async function fetchFilteredTransactions(
 
 export async function fetchTransactionsPages(query: string) {
     try {
-        const count = await prisma.transactions.count({
+        const userId = await getUserId();
+        const count = await prisma.transaction.count({
             where: {
+                user_id: userId,
                 name: { contains: query, mode: "insensitive" }
             }
         });

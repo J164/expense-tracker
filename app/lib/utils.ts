@@ -1,3 +1,10 @@
+import { auth } from "@/auth";
+
+export async function getUserId() {
+    const session = await auth();
+    return session!.user!.id!;
+}
+
 export const formatDateToLocal = (
     dateStr: string,
     locale: string = "en-US"

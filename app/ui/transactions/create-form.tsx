@@ -12,7 +12,7 @@ const defaultCategories = ["Dining", "Entertainment"];
 
 export default async function Form() {
     return (
-        <form action={createTransaction.bind(null, 1)}>
+        <form action={createTransaction}>
             <div className="rounded-md bg-gray-50 p-4 md:p-6">
                 <div className="mb-4">
                     <label

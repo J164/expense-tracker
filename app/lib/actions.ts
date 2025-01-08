@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "./prisma";
+import { getUserId } from "./utils";
 
 const CreateTransactionSchema = z.object({
     name: z.string(),
@@ -12,7 +13,8 @@ const CreateTransactionSchema = z.object({
     category: z.string()
 });
 
-export async function createTransaction(userId: number, formData: FormData) {
+export async function createTransaction(formData: FormData) {
+    const userId = await getUserId();
     const { name, amount, date, category } = CreateTransactionSchema.parse({
         name: formData.get("name"),
         amount: formData.get("amount"),
@@ -20,7 +22,7 @@ export async function createTransaction(userId: number, formData: FormData) {
         category: formData.get("category")
     });
 
-    await prisma.transactions.create({
+    await prisma.transaction.create({
         data: {
             user_id: userId,
             amount,

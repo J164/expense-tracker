@@ -20,8 +20,8 @@ export function Card({
     );
 }
 
-export async function CardWrapper({ userId }: { userId: number }) {
-    const { total_spent, budget } = await fetchCardData(userId);
+export default async function CardWrapper() {
+    const { total_spent, budget } = await fetchCardData();
 
     return (
         <>

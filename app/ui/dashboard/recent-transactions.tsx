@@ -4,12 +4,8 @@ import { lusitana } from "./fonts";
 import Link from "next/link";
 import { fetchRecentTransactions } from "@/app/lib/data";
 
-export default async function RecentTransactions({
-    userId
-}: {
-    userId: number;
-}) {
-    const transactions = await fetchRecentTransactions(userId);
+export default async function RecentTransactions() {
+    const transactions = await fetchRecentTransactions();
 
     return (
         <div className="flex w-full flex-col md:col-span-4">
