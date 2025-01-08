@@ -7,16 +7,7 @@ export const authConfig = {
     },
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
-            const isLoggedIn = !!auth;
-            if (nextUrl.pathname.startsWith("/dashboard")) {
-                return isLoggedIn;
-            }
-
-            if (isLoggedIn) {
-                return Response.redirect(new URL("/dashboard", nextUrl));
-            }
-
-            return true;
+            return !nextUrl.pathname.startsWith("/dashboard") || !!auth;
         }
     },
     providers: [Google]
