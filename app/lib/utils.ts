@@ -1,5 +1,7 @@
 import { auth } from "@/auth";
 
+export const defaultCategories = ["Dining", "Entertainment"];
+
 export async function getUserId() {
     const session = await auth();
     return session!.user!.id!;

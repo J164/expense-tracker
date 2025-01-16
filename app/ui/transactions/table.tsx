@@ -45,8 +45,12 @@ export default async function TransactionsTable({
                                         )}
                                     </p>
                                     <div className="flex justify-end gap-2">
-                                        <UpdateTransaction />
-                                        <DeleteTransaction />
+                                        <UpdateTransaction
+                                            id={transaction.id}
+                                        />
+                                        <DeleteTransaction
+                                            id={transaction.id}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -113,8 +117,12 @@ export default async function TransactionsTable({
                                     </td>
                                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                                         <div className="flex justify-end gap-3">
-                                            <UpdateTransaction />
-                                            <DeleteTransaction />
+                                            <UpdateTransaction
+                                                id={transaction.id}
+                                            />
+                                            <DeleteTransaction
+                                                id={transaction.id}
+                                            />
                                         </div>
                                     </td>
                                 </tr>

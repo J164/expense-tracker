@@ -17,6 +17,18 @@ export async function fetchUser() {
     }
 }
 
+export async function fetchTransaction(id: string) {
+    try {
+        const data = await prisma.transaction.findUniqueOrThrow({
+            where: { id }
+        });
+        return data;
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch transaction.");
+    }
+}
+
 export async function fetchCardData() {
     const currentMonth = new Date(
         new Date().getFullYear(),
