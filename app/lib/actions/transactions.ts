@@ -38,6 +38,7 @@ export async function createTransaction(formData: FormData) {
 }
 
 export async function updateTransaction(id: string, formData: FormData) {
+    const userId = await getUserId();
     const { name, amount, date, category } = TransactionSchema.parse({
         name: formData.get("name"),
         amount: formData.get("amount"),
@@ -46,7 +47,7 @@ export async function updateTransaction(id: string, formData: FormData) {
     });
 
     await prisma.transaction.update({
-        where: { id },
+        where: { id, user_id: userId },
         data: {
             amount,
             category,
@@ -60,8 +61,9 @@ export async function updateTransaction(id: string, formData: FormData) {
 }
 
 export async function deleteTransaction(id: string) {
+    const userId = await getUserId();
     await prisma.transaction.delete({
-        where: { id }
+        where: { id, user_id: userId }
     });
     revalidatePath("/dashboard/transactions");
 }
