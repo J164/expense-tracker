@@ -1,6 +1,10 @@
 "use client";
 
-import { HomeIcon, ArrowsRightLeftIcon } from "@heroicons/react/24/outline";
+import {
+    HomeIcon,
+    ArrowsRightLeftIcon,
+    UserCircleIcon
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,6 +15,11 @@ const links = [
         name: "Transactions",
         href: "/dashboard/transactions",
         icon: ArrowsRightLeftIcon
+    },
+    {
+        name: "Profile",
+        href: "/dashboard/profile",
+        icon: UserCircleIcon
     }
 ];
 

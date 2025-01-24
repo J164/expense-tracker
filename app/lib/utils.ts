@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { Transaction } from "@prisma/client";
-import { FormatTransaction } from "./types";
+import { FormatProfile, FormatTransaction, ProfileData } from "./types";
 
 export const defaultCategories = ["Dining", "Entertainment"];
 
@@ -53,5 +53,11 @@ export function formatTransaction(transaction: Transaction): FormatTransaction {
         amount: transaction.amount.toFixed(2),
         purchase_date: transaction.purchase_date.toISOString().split("T")[0],
         created_at: transaction.created_at.toISOString().split("T")[0]
+    };
+}
+
+export function formatProfile(profile: ProfileData): FormatProfile {
+    return {
+        default_budget: profile.default_budget.toFixed(2)
     };
 }

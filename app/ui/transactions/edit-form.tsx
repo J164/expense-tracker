@@ -95,7 +95,7 @@ export default function EditInvoiceForm({
 
                 <div className="mb-4">
                     <label
-                        htmlFor="customer"
+                        htmlFor="category"
                         className="mb-2 block text-sm font-medium"
                     >
                         Choose category
