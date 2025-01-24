@@ -35,6 +35,8 @@ export function DeleteTransaction({ id }: { id: string }) {
             action={deleteTransactionWithId}
             icon={<TrashIcon className="w-5" />}
             type="destructive"
-        ></FormModal>
+        >
+            <></>
+        </FormModal>
     );
 }
