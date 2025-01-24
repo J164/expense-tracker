@@ -1,4 +1,6 @@
 import { auth } from "@/auth";
+import { Transaction } from "@prisma/client";
+import { FormatTransaction } from "./types";
 
 export const defaultCategories = ["Dining", "Entertainment"];
 
@@ -14,7 +16,7 @@ export const formatDateToLocal = (
     const date = new Date(dateStr);
     const options: Intl.DateTimeFormatOptions = {
         day: "numeric",
-        month: "short",
+        month: "long",
         year: "numeric"
     };
     const formatter = new Intl.DateTimeFormat(locale, options);
@@ -44,3 +46,12 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
         totalPages
     ];
 };
+
+export function formatTransaction(transaction: Transaction): FormatTransaction {
+    return {
+        ...transaction,
+        amount: transaction.amount.toFixed(2),
+        purchase_date: transaction.purchase_date.toISOString().split("T")[0],
+        created_at: transaction.created_at.toISOString().split("T")[0]
+    };
+}

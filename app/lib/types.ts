@@ -1,5 +1,8 @@
-import { Transaction } from "@prisma/client";
-
-export type PlainTransaction = Omit<Transaction, "amount"> & {
-    amount: number;
+export type FormatTransaction = {
+    id: string;
+    name: string;
+    amount: string;
+    purchase_date: string;
+    created_at: string;
+    category: string | null;
 };

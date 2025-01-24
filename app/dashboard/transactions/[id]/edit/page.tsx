@@ -1,4 +1,5 @@
 import { fetchTransaction } from "@/app/lib/data";
+import { formatTransaction } from "@/app/lib/utils";
 import Breadcrumbs from "@/app/ui/transactions/breadcrumbs";
 import Form from "@/app/ui/transactions/edit-form";
 
@@ -19,12 +20,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     }
                 ]}
             />
-            <Form
-                transaction={{
-                    ...transaction,
-                    amount: transaction.amount.toNumber()
-                }}
-            />
+            <Form transaction={formatTransaction(transaction)} />
         </main>
     );
 }

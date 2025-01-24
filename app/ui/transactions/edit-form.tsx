@@ -10,12 +10,12 @@ import {
 import { Button } from "../button";
 import { updateTransaction } from "@/app/lib/actions/transactions";
 import { defaultCategories } from "@/app/lib/utils";
-import { PlainTransaction } from "@/app/lib/types";
+import { FormatTransaction } from "@/app/lib/types";
 
 export default function EditInvoiceForm({
     transaction
 }: {
-    transaction: PlainTransaction;
+    transaction: FormatTransaction;
 }) {
     const updateTransactionWithId = updateTransaction.bind(
         null,
@@ -84,11 +84,7 @@ export default function EditInvoiceForm({
                                 id="date"
                                 name="date"
                                 type="date"
-                                defaultValue={
-                                    transaction.purchase_date
-                                        .toISOString()
-                                        .split("T")[0]
-                                }
+                                defaultValue={transaction.purchase_date}
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-500"
                                 required
                             />
