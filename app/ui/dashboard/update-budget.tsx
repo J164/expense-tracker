@@ -1,5 +1,5 @@
 "use client";
-import { CurrencyDollarIcon } from "@heroicons/react/24/outline";
+import { CurrencyDollarIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Modal from "../modal";
 import { updateBudget } from "@/app/lib/actions/dashboard";
 
@@ -13,7 +13,11 @@ export default function UpdateBudget({
     const updateBudgetWithId = updateBudget.bind(null, id);
 
     return (
-        <Modal action={updateBudgetWithId} title="Update Budget">
+        <Modal
+            action={updateBudgetWithId}
+            title="Update Budget"
+            icon={<PencilIcon className="w-5" />}
+        >
             <div className="mb-4">
                 <label
                     htmlFor="amount"

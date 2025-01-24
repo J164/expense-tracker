@@ -1,6 +1,7 @@
 import { deleteTransaction } from "@/app/lib/actions/transactions";
 import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import FormModal from "../modal";
 
 export function CreateTransaction() {
     return (
@@ -29,14 +30,11 @@ export function DeleteTransaction({ id }: { id: string }) {
     const deleteTransactionWithId = deleteTransaction.bind(null, id);
 
     return (
-        <form action={deleteTransactionWithId}>
-            <button
-                type="submit"
-                className="rounded-md border p-2 hover:bg-gray-100"
-            >
-                <span className="sr-only">Delete</span>
-                <TrashIcon className="w-5" />
-            </button>
-        </form>
+        <FormModal
+            title="Are you sure?"
+            action={deleteTransactionWithId}
+            icon={<TrashIcon className="w-5" />}
+            type="destructive"
+        ></FormModal>
     );
 }

@@ -1,15 +1,20 @@
 "use client";
 
-import { PencilIcon } from "@heroicons/react/24/outline";
 import React, { useEffect, useRef, useState } from "react";
+
+type ModalType = "default" | "destructive";
 
 export default function FormModal({
     title,
     action,
+    icon,
+    type = "default",
     children
 }: {
     title: string;
     action: (formData: FormData) => void;
+    icon: React.ReactNode;
+    type?: ModalType;
     children: React.ReactNode;
 }) {
     const modalRef = useRef<HTMLDivElement | null>(null);
@@ -44,8 +49,11 @@ export default function FormModal({
 
     return (
         <>
-            <button onClick={() => setShowModal(true)}>
-                <PencilIcon className="w-5" />
+            <button
+                onClick={() => setShowModal(true)}
+                className="rounded-md border p-2 hover:bg-gray-100"
+            >
+                {icon}
             </button>
 
             {showModal && (
@@ -64,10 +72,17 @@ export default function FormModal({
                                 {children}
                                 <div className="flex items-center justify-end">
                                     <button
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                        className={
+                                            (type === "destructive"
+                                                ? "bg-red-500"
+                                                : "bg-blue-500") +
+                                            " hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                        }
                                         type="submit"
                                     >
-                                        Save
+                                        {type === "destructive"
+                                            ? "Delete"
+                                            : "Save"}
                                     </button>
                                     <button
                                         className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
