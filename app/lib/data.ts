@@ -49,6 +49,7 @@ export async function fetchCardData() {
             }
         },
         select: {
+            id: true,
             user_id: true,
             budget: true,
             total_spent: true
@@ -61,6 +62,7 @@ export async function fetchCardData() {
             select: { default_budget: true }
         });
         return {
+            id: null,
             user_id: userId,
             total_spent: new Decimal(0),
             budget: data.default_budget
