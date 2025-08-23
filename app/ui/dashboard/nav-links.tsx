@@ -3,7 +3,8 @@
 import {
     HomeIcon,
     ArrowsRightLeftIcon,
-    UserCircleIcon
+    UserCircleIcon,
+    ArrowPathIcon
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
@@ -15,6 +16,11 @@ const links = [
         name: "Transactions",
         href: "/dashboard/transactions",
         icon: ArrowsRightLeftIcon
+    },
+    {
+        name: "Recurring",
+        href: "/dashboard/recurring",
+        icon: ArrowPathIcon
     },
     {
         name: "Profile",

@@ -1,6 +1,12 @@
 import { auth } from "@/auth";
 import { Transaction } from "@prisma/client";
-import { FormatProfile, FormatTransaction, ProfileData } from "./types";
+import {
+    FormatProfile,
+    FormatTransaction,
+    ProfileData,
+    RecurringTransactionData,
+    FormatRecurringTransaction
+} from "./types";
 
 export const defaultCategories = ["Dining", "Entertainment"];
 
@@ -59,5 +65,21 @@ export function formatTransaction(transaction: Transaction): FormatTransaction {
 export function formatProfile(profile: ProfileData): FormatProfile {
     return {
         monthly_budget: profile.monthly_budget.toFixed(2)
+    };
+}
+
+export function formatRecurringTransaction(
+    recurringTransaction: RecurringTransactionData
+): FormatRecurringTransaction {
+    return {
+        ...recurringTransaction,
+        amount: recurringTransaction.amount.toFixed(2),
+        start_date: recurringTransaction.start_date.toISOString().split("T")[0],
+        end_date:
+            recurringTransaction.end_date?.toISOString().split("T")[0] || null,
+        created_at: recurringTransaction.created_at.toISOString().split("T")[0],
+        last_generated:
+            recurringTransaction.last_generated?.toISOString().split("T")[0] ||
+            null
     };
 }

@@ -16,3 +16,31 @@ export type ProfileData = {
 export type FormatProfile = {
     monthly_budget: string;
 };
+
+export type RecurrenceFrequency = "MONTHLY" | "YEARLY";
+
+export type FormatRecurringTransaction = {
+    id: string;
+    name: string;
+    amount: string;
+    category: string | null;
+    frequency: RecurrenceFrequency;
+    start_date: string;
+    end_date: string | null;
+    is_active: boolean;
+    created_at: string;
+    last_generated: string | null;
+};
+
+export type RecurringTransactionData = {
+    id: string;
+    name: string;
+    amount: Decimal;
+    category: string | null;
+    frequency: RecurrenceFrequency;
+    start_date: Date;
+    end_date: Date | null;
+    is_active: boolean;
+    created_at: Date;
+    last_generated: Date | null;
+};
