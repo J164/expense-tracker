@@ -8,7 +8,15 @@ import {
     FormatRecurringTransaction
 } from "./types";
 
-export const defaultCategories = ["Dining", "Entertainment"];
+export const defaultCategories = [
+    "groceries",
+    "dining",
+    "entertainment",
+    "fitness",
+    "personal",
+    "utilities",
+    "other"
+];
 
 export async function getUserId() {
     const session = await auth();

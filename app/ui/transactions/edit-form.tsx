@@ -9,13 +9,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "../button";
 import { updateTransaction } from "@/app/lib/actions/transactions";
-import { defaultCategories } from "@/app/lib/utils";
 import { FormatTransaction } from "@/app/lib/types";
 
 export default function EditInvoiceForm({
-    transaction
+    transaction,
+    availableTags
 }: {
     transaction: FormatTransaction;
+    availableTags: string[];
 }) {
     const updateTransactionWithId = updateTransaction.bind(
         null,
@@ -110,7 +111,7 @@ export default function EditInvoiceForm({
                             <option value="" disabled>
                                 Select a category
                             </option>
-                            {defaultCategories.map(category => (
+                            {availableTags.map(category => (
                                 <option key={category} value={category}>
                                     {category}
                                 </option>

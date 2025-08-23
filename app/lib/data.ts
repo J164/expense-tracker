@@ -190,3 +190,23 @@ export async function fetchRecurringTransactionsPages(query: string) {
     });
     return Math.ceil(count / ITEMS_PER_PAGE);
 }
+
+export async function fetchUserTags() {
+    const userId = await getUserId();
+    const data = await prisma.userTag.findMany({
+        where: { user_id: userId },
+        orderBy: { name: "asc" }
+    });
+    return data;
+}
+
+export async function fetchAllAvailableTags() {
+    const userTags = await fetchUserTags();
+    const { defaultCategories } = await import("./utils");
+
+    // Combine default categories with user custom tags
+    const allTags = [...defaultCategories, ...userTags.map(tag => tag.name)];
+
+    // Remove duplicates and sort
+    return [...new Set(allTags)].sort();
+}

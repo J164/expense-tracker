@@ -44,3 +44,10 @@ export type RecurringTransactionData = {
     created_at: Date;
     last_generated: Date | null;
 };
+
+export type UserTag = {
+    id: string;
+    name: string;
+    user_id: string;
+    created_at: Date;
+};

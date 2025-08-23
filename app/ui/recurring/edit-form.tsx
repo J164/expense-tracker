@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-    ArchiveBoxArrowDownIcon,
     CalendarDateRangeIcon,
     CurrencyDollarIcon,
     IdentificationIcon,
@@ -8,8 +7,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "../button";
 import { updateRecurringTransaction } from "@/app/lib/actions/recurring-transactions";
-import { defaultCategories, formatRecurringTransaction } from "@/app/lib/utils";
+import { formatRecurringTransaction } from "@/app/lib/utils";
 import { RecurringTransactionData } from "@/app/lib/types";
+import CategorySelector from "../category-selector";
 
 export default async function EditRecurringTransactionForm({
     recurringTransaction
@@ -149,24 +149,7 @@ export default async function EditRecurringTransactionForm({
                     >
                         Choose category
                     </label>
-                    <div className="relative">
-                        <select
-                            id="category"
-                            name="category"
-                            className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-500"
-                            defaultValue={formatted.category || ""}
-                        >
-                            <option value="" disabled>
-                                Select a category
-                            </option>
-                            {defaultCategories.map(category => (
-                                <option key={category} value={category}>
-                                    {category}
-                                </option>
-                            ))}
-                        </select>
-                        <ArchiveBoxArrowDownIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-                    </div>
+                    <CategorySelector defaultValue={formatted.category || ""} />
                 </div>
             </div>
             <div className="mt-6 flex justify-end gap-4">
