@@ -58,6 +58,6 @@ export function formatTransaction(transaction: Transaction): FormatTransaction {
 
 export function formatProfile(profile: ProfileData): FormatProfile {
     return {
-        default_budget: profile.default_budget.toFixed(2)
+        monthly_budget: profile.monthly_budget.toFixed(2)
     };
 }

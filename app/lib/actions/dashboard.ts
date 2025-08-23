@@ -9,16 +9,16 @@ const BudgetSchema = z.object({
     budget: z.coerce.number()
 });
 
-export async function updateBudget(id: string, formData: FormData) {
+export async function updateBudget(formData: FormData) {
     const userId = await getUserId();
     const { budget } = BudgetSchema.parse({
         budget: formData.get("budget")
     });
 
-    await prisma.monthlySummary.update({
-        where: { id, user_id: userId },
+    await prisma.user.update({
+        where: { id: userId },
         data: {
-            budget
+            monthly_budget: budget
         }
     });
 

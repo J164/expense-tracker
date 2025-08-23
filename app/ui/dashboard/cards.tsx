@@ -5,12 +5,12 @@ import UpdateBudget from "./update-budget";
 
 export function Card({
     title,
-    budgetId,
+    showBudgetUpdate,
     budget,
     children
 }: {
     title: string;
-    budgetId: string | null;
+    showBudgetUpdate: boolean;
     budget: string;
     children: React.ReactNode;
 }) {
@@ -20,7 +20,7 @@ export function Card({
                 <BanknotesIcon className="h-5 w-5 text-gray-700" />
                 <h3 className="ml-2 text-sm font-medium">{title}</h3>
                 <div className="ml-auto">
-                    {budgetId && <UpdateBudget id={budgetId} budget={budget} />}
+                    {showBudgetUpdate && <UpdateBudget budget={budget} />}
                 </div>
             </div>
             {children}
@@ -29,13 +29,13 @@ export function Card({
 }
 
 export default async function CardWrapper() {
-    const { id, total_spent, budget } = await fetchCardData();
+    const { total_spent, budget } = await fetchCardData();
 
     return (
         <>
             <Card
                 title="Remaining Budget"
-                budgetId={id}
+                showBudgetUpdate={true}
                 budget={budget.toFixed(2)}
             >
                 <p

@@ -6,19 +6,19 @@ import { prisma } from "../prisma";
 import { revalidatePath } from "next/cache";
 
 const ProfileSchema = z.object({
-    default_budget: z.coerce.number()
+    monthly_budget: z.coerce.number()
 });
 
 export async function updateProfile(formData: FormData) {
     const userId = await getUserId();
-    const { default_budget } = ProfileSchema.parse({
-        default_budget: formData.get("budget")
+    const { monthly_budget } = ProfileSchema.parse({
+        monthly_budget: formData.get("budget")
     });
 
     await prisma.user.update({
         where: { id: userId },
         data: {
-            default_budget
+            monthly_budget
         }
     });
 

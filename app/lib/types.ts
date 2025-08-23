@@ -10,9 +10,9 @@ export type FormatTransaction = {
 };
 
 export type ProfileData = {
-    default_budget: Decimal;
+    monthly_budget: Decimal;
 };
 
 export type FormatProfile = {
-    default_budget: string;
+    monthly_budget: string;
 };

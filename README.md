@@ -102,10 +102,8 @@ expense-tracker/
 
 The application uses the following main models:
 
-- **User**: User accounts and authentication
-- **Transaction**: Individual expense records
-- **TransactionItem**: Line items within transactions
-- **MonthlySummary**: Monthly budget and spending summaries
+- **User**: User accounts with authentication and monthly budget preferences
+- **Transaction**: Individual expense records with automatic monthly aggregation
 
 ## 🧪 Available Scripts
 

@@ -17,7 +17,7 @@ export async function fetchProfile() {
     const data = await prisma.user.findUniqueOrThrow({
         where: { id: userId },
         select: {
-            default_budget: true
+            monthly_budget: true
         }
     });
     return data;
@@ -36,40 +36,37 @@ export async function fetchCardData() {
         new Date().getMonth(),
         1
     );
+    const nextMonth = new Date(
+        new Date(currentMonth).setMonth(currentMonth.getMonth() + 1)
+    );
 
     const userId = await getUserId();
-    const data = await prisma.monthlySummary.findFirst({
+
+    const user = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { monthly_budget: true }
+    });
+
+    const result = await prisma.transaction.aggregate({
         where: {
             user_id: userId,
-            month: {
+            purchase_date: {
                 gte: currentMonth,
-                lt: new Date(
-                    new Date(currentMonth).setMonth(currentMonth.getMonth() + 1)
-                )
+                lt: nextMonth
             }
         },
-        select: {
-            id: true,
-            user_id: true,
-            budget: true,
-            total_spent: true
+        _sum: {
+            amount: true
         }
     });
 
-    if (!data) {
-        const data = await prisma.user.findUniqueOrThrow({
-            where: { id: userId },
-            select: { default_budget: true }
-        });
-        return {
-            id: null,
-            user_id: userId,
-            total_spent: new Decimal(0),
-            budget: data.default_budget
-        };
-    }
+    const totalSpent = result._sum.amount || new Decimal(0);
 
-    return data;
+    return {
+        user_id: userId,
+        total_spent: totalSpent,
+        budget: user.monthly_budget
+    };
 }
 
 export async function fetchRecentTransactions() {

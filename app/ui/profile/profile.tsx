@@ -14,7 +14,7 @@ export default function Profile({ profile }: { profile: FormatProfile }) {
                         htmlFor="amount"
                         className="mb-2 block text-sm font-medium"
                     >
-                        Enter your default monthly budget
+                        Enter your monthly budget
                     </label>
                     <div className="relative mt-2 rounded-md">
                         <div className="relative">
@@ -24,7 +24,7 @@ export default function Profile({ profile }: { profile: FormatProfile }) {
                                 type="number"
                                 step="0.01"
                                 placeholder="Enter USD amount"
-                                defaultValue={profile.default_budget}
+                                defaultValue={profile.monthly_budget}
                                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-500"
                                 required
                             />

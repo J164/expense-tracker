@@ -3,18 +3,10 @@ import { CurrencyDollarIcon, PencilIcon } from "@heroicons/react/24/outline";
 import Modal from "../modal";
 import { updateBudget } from "@/app/lib/actions/dashboard";
 
-export default function UpdateBudget({
-    id,
-    budget
-}: {
-    id: string;
-    budget: string;
-}) {
-    const updateBudgetWithId = updateBudget.bind(null, id);
-
+export default function UpdateBudget({ budget }: { budget: string }) {
     return (
         <Modal
-            action={updateBudgetWithId}
+            action={updateBudget}
             title="Update Budget"
             icon={<PencilIcon className="w-5" />}
         >
@@ -23,7 +15,7 @@ export default function UpdateBudget({
                     htmlFor="amount"
                     className="mb-2 block text-sm font-medium"
                 >
-                    Enter your budget for this month
+                    Enter your monthly budget
                 </label>
                 <div className="relative mt-2 rounded-md">
                     <div className="relative">
@@ -40,8 +32,7 @@ export default function UpdateBudget({
                         <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
                     </div>
                     <p className="mt-2 text-xs text-gray-500">
-                        Note: this will not affect your default budget for
-                        future months
+                        This updates your monthly budget
                     </p>
                 </div>
             </div>
