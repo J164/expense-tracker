@@ -10,31 +10,56 @@ export async function handleAuthSignIn(input: {
         return false;
     }
 
-    const persistedUser = await upsertUser({
-        email: input.user.email,
-        name: input.user.name,
-        image: input.user.image,
-        providerAccountId: input.providerAccountId ?? null
-    });
+    try {
+        const persistedUser = await upsertUser({
+            email: input.user.email,
+            name: input.user.name,
+            image: input.user.image,
+            providerAccountId: input.providerAccountId ?? null
+        });
 
-    input.user.id = persistedUser.id;
-    return true;
+        input.user.id = persistedUser.id;
+        return true;
+    } catch (error) {
+        console.error("[auth] Failed to persist signed-in user", {
+            email: input.user.email,
+            providerAccountId: input.providerAccountId ?? null,
+            error
+        });
+
+        const existingUser = await getUserByEmail(input.user.email);
+        if (existingUser) {
+            input.user.id = existingUser.id;
+            return true;
+        }
+
+        throw error;
+    }
 }
 
 export async function hydrateTokenUserId(token: JWT, user?: User) {
-    if (user?.id) {
-        token.id = user.id;
+    try {
+        if (user?.id) {
+            token.id = user.id;
+            return token;
+        }
+
+        if (token.email && !token.id) {
+            const existingUser = await getUserByEmail(token.email);
+            if (existingUser) {
+                token.id = existingUser.id;
+            }
+        }
+
+        return token;
+    } catch (error) {
+        console.error("[auth] Failed to hydrate token user id", {
+            email: token.email,
+            error
+        });
+
         return token;
     }
-
-    if (token.email && !token.id) {
-        const existingUser = await getUserByEmail(token.email);
-        if (existingUser) {
-            token.id = existingUser.id;
-        }
-    }
-
-    return token;
 }
 
 export function attachSessionUserId(session: Session, token: JWT) {
