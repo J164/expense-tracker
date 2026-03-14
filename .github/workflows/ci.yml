@@ -9,6 +9,9 @@ on:
 jobs:
     validate:
         runs-on: ubuntu-latest
+        env:
+            AUTH_SECRET: ci-test-secret
+            AUTH_ENABLE_TEST_PROVIDER: "true"
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4

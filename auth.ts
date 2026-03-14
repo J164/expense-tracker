@@ -13,11 +13,14 @@ const isTestAuthEnabled =
     process.env.AUTH_ENABLE_TEST_PROVIDER === "true" ||
     (process.env.NODE_ENV !== "production" &&
         process.env.AUTH_ENABLE_TEST_PROVIDER !== "false");
+const isGoogleAuthEnabled =
+    Boolean(process.env.AUTH_GOOGLE_ID) &&
+    Boolean(process.env.AUTH_GOOGLE_SECRET);
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     providers: [
-        Google,
+        ...(isGoogleAuthEnabled ? [Google] : []),
         ...(isTestAuthEnabled
             ? [
                   Credentials({
