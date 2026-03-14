@@ -24,7 +24,6 @@ pnpm install
 AUTH_SECRET="replace-me"
 AUTH_GOOGLE_ID="replace-me"
 AUTH_GOOGLE_SECRET="replace-me"
-CRON_SECRET="replace-me"
 AUTH_ENABLE_TEST_PROVIDER="true"
 ```
 
