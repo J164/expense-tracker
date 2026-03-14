@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createTag, deleteTag } from "@/app/lib/actions/profile";
 import { UserTag } from "@/app/lib/types";
-import { defaultCategories } from "@/app/lib/utils";
+import { defaultCategories } from "@/app/lib/constants";
 
 interface TagManagerProps {
     userTags: UserTag[];

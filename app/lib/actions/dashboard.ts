@@ -1,26 +1,23 @@
 "use server";
 
 import { z } from "zod";
-import { getUserId } from "../utils";
-import { prisma } from "../prisma";
+import { requireUserId } from "../session";
 import { revalidatePath } from "next/cache";
+import { dollarsToCents } from "../currency";
+import { updateBudget as updateBudgetInRepo } from "../server/repository";
 
 const BudgetSchema = z.object({
     budget: z.coerce.number()
 });
 
 export async function updateBudget(formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { budget } = BudgetSchema.parse({
         budget: formData.get("budget")
     });
 
-    await prisma.user.update({
-        where: { id: userId },
-        data: {
-            monthly_budget: budget
-        }
-    });
+    await updateBudgetInRepo(userId, dollarsToCents(budget));
 
     revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
 }

@@ -47,7 +47,7 @@ export default async function RecurringTransactionsTable({
                                             <ToggleRecurringTransactionStatus
                                                 id={recurringTransaction.id}
                                                 isActive={
-                                                    recurringTransaction.is_active
+                                                    recurringTransaction.isActive
                                                 }
                                             />
                                         </div>
@@ -160,7 +160,7 @@ export default async function RecurringTransactionsTable({
                                                 <ToggleRecurringTransactionStatus
                                                     id={recurringTransaction.id}
                                                     isActive={
-                                                        recurringTransaction.is_active
+                                                        recurringTransaction.isActive
                                                     }
                                                 />
                                             </td>

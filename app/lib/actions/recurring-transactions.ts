@@ -3,12 +3,18 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { prisma } from "../prisma";
-import { getUserId } from "../utils";
-import { RecurrenceFrequency } from "../types";
+import { dollarsToCents } from "../currency";
+import type { RecurrenceFrequency } from "../types";
+import {
+    createRecurringTransaction as createRecurringTransactionInRepo,
+    deleteRecurringTransaction as deleteRecurringTransactionInRepo,
+    toggleRecurringTransactionStatus as toggleRecurringTransactionStatusInRepo,
+    updateRecurringTransaction as updateRecurringTransactionInRepo
+} from "../server/repository";
+import { requireUserId } from "../session";
 
 const RecurringTransactionSchema = z.object({
-    name: z.string(),
+    name: z.string().trim().min(1),
     amount: z.coerce.number(),
     start_date: z.string(),
     end_date: z.string().optional(),
@@ -17,7 +23,7 @@ const RecurringTransactionSchema = z.object({
 });
 
 export async function createRecurringTransaction(formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { name, amount, start_date, end_date, category, frequency } =
         RecurringTransactionSchema.parse({
             name: formData.get("name"),
@@ -28,20 +34,19 @@ export async function createRecurringTransaction(formData: FormData) {
             frequency: formData.get("frequency")
         });
 
-    await prisma.recurringTransaction.create({
-        data: {
-            user_id: userId,
-            name,
-            amount,
-            category,
-            frequency: frequency as RecurrenceFrequency,
-            start_date: new Date(start_date),
-            end_date: end_date ? new Date(end_date) : null,
-            created_at: new Date()
-        }
+    await createRecurringTransactionInRepo({
+        userId,
+        name,
+        amountCents: dollarsToCents(amount),
+        category: category || null,
+        frequency: frequency as RecurrenceFrequency,
+        startDate: start_date,
+        endDate: end_date || null
     });
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/recurring");
+    revalidatePath("/dashboard/transactions");
     redirect("/dashboard/recurring");
 }
 
@@ -49,7 +54,7 @@ export async function updateRecurringTransaction(
     id: string,
     formData: FormData
 ) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { name, amount, start_date, end_date, category, frequency } =
         RecurringTransactionSchema.parse({
             name: formData.get("name"),
@@ -60,47 +65,35 @@ export async function updateRecurringTransaction(
             frequency: formData.get("frequency")
         });
 
-    await prisma.recurringTransaction.update({
-        where: { id, user_id: userId },
-        data: {
-            name,
-            amount,
-            category,
-            frequency: frequency as RecurrenceFrequency,
-            start_date: new Date(start_date),
-            end_date: end_date ? new Date(end_date) : null
-        }
+    await updateRecurringTransactionInRepo({
+        id,
+        userId,
+        name,
+        amountCents: dollarsToCents(amount),
+        category: category || null,
+        frequency: frequency as RecurrenceFrequency,
+        startDate: start_date,
+        endDate: end_date || null
     });
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/recurring");
+    revalidatePath("/dashboard/transactions");
     redirect("/dashboard/recurring");
 }
 
 export async function deleteRecurringTransaction(id: string) {
-    const userId = await getUserId();
-    await prisma.recurringTransaction.delete({
-        where: { id, user_id: userId }
-    });
+    const userId = await requireUserId();
+    await deleteRecurringTransactionInRepo(userId, id);
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/recurring");
+    revalidatePath("/dashboard/transactions");
 }
 
 export async function toggleRecurringTransactionStatus(id: string) {
-    const userId = await getUserId();
-
-    const recurringTransaction = await prisma.recurringTransaction.findFirst({
-        where: { id, user_id: userId }
-    });
-
-    if (!recurringTransaction) {
-        throw new Error("Recurring transaction not found");
-    }
-
-    await prisma.recurringTransaction.update({
-        where: { id, user_id: userId },
-        data: {
-            is_active: !recurringTransaction.is_active
-        }
-    });
-
+    const userId = await requireUserId();
+    await toggleRecurringTransactionStatusInRepo(userId, id);
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/recurring");
+    revalidatePath("/dashboard/transactions");
 }

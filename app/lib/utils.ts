@@ -1,33 +1,18 @@
-import { auth } from "@/auth";
-import { Transaction } from "@prisma/client";
-import {
+import { formatCents } from "./currency";
+import type {
     FormatProfile,
+    FormatRecurringTransaction,
     FormatTransaction,
     ProfileData,
     RecurringTransactionData,
-    FormatRecurringTransaction
+    TransactionRecord
 } from "./types";
-
-export const defaultCategories = [
-    "groceries",
-    "dining",
-    "entertainment",
-    "fitness",
-    "personal",
-    "utilities",
-    "other"
-];
-
-export async function getUserId() {
-    const session = await auth();
-    return session!.user!.id!;
-}
 
 export const formatDateToLocal = (
     dateStr: string,
     locale: string = "en-US"
 ) => {
-    const date = new Date(dateStr);
+    const date = new Date(`${dateStr}T00:00:00.000Z`);
     const options: Intl.DateTimeFormatOptions = {
         day: "numeric",
         month: "long",
@@ -61,18 +46,22 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     ];
 };
 
-export function formatTransaction(transaction: Transaction): FormatTransaction {
+export function formatTransaction(
+    transaction: TransactionRecord
+): FormatTransaction {
     return {
-        ...transaction,
-        amount: transaction.amount.toFixed(2),
-        purchase_date: transaction.purchase_date.toISOString().split("T")[0],
-        created_at: transaction.created_at.toISOString().split("T")[0]
+        id: transaction.id,
+        name: transaction.name,
+        amount: formatCents(transaction.amountCents),
+        purchase_date: transaction.purchaseDate,
+        created_at: transaction.createdAt.slice(0, 10),
+        category: transaction.category
     };
 }
 
 export function formatProfile(profile: ProfileData): FormatProfile {
     return {
-        monthly_budget: profile.monthly_budget.toFixed(2)
+        monthly_budget: formatCents(profile.monthlyBudgetCents)
     };
 }
 
@@ -80,14 +69,15 @@ export function formatRecurringTransaction(
     recurringTransaction: RecurringTransactionData
 ): FormatRecurringTransaction {
     return {
-        ...recurringTransaction,
-        amount: recurringTransaction.amount.toFixed(2),
-        start_date: recurringTransaction.start_date.toISOString().split("T")[0],
-        end_date:
-            recurringTransaction.end_date?.toISOString().split("T")[0] || null,
-        created_at: recurringTransaction.created_at.toISOString().split("T")[0],
-        last_generated:
-            recurringTransaction.last_generated?.toISOString().split("T")[0] ||
-            null
+        id: recurringTransaction.id,
+        name: recurringTransaction.name,
+        amount: formatCents(recurringTransaction.amountCents),
+        category: recurringTransaction.category,
+        frequency: recurringTransaction.frequency,
+        start_date: recurringTransaction.startDate,
+        end_date: recurringTransaction.endDate,
+        is_active: recurringTransaction.isActive,
+        created_at: recurringTransaction.createdAt.slice(0, 10),
+        last_generated: recurringTransaction.lastGenerated
     };
 }

@@ -1,8 +1,13 @@
 "use server";
 
 import { z } from "zod";
-import { getUserId } from "../utils";
-import { prisma } from "../prisma";
+import { dollarsToCents } from "../currency";
+import {
+    createTag as createTagInRepo,
+    deleteTag as deleteTagInRepo,
+    updateBudget
+} from "../server/repository";
+import { requireUserId } from "../session";
 import { revalidatePath } from "next/cache";
 
 const ProfileSchema = z.object({
@@ -12,50 +17,30 @@ const ProfileSchema = z.object({
 const TagSchema = z.object({
     name: z
         .string()
+        .trim()
         .min(1, "Tag name is required")
         .max(50, "Tag name must be 50 characters or less")
 });
 
 export async function updateProfile(formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { monthly_budget } = ProfileSchema.parse({
         monthly_budget: formData.get("budget")
     });
 
-    await prisma.user.update({
-        where: { id: userId },
-        data: {
-            monthly_budget
-        }
-    });
+    await updateBudget(userId, dollarsToCents(monthly_budget));
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/profile");
 }
 
 export async function createTag(formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { name } = TagSchema.parse({
         name: formData.get("tagName")
     });
 
-    // Check if tag already exists for this user
-    const existingTag = await prisma.userTag.findFirst({
-        where: {
-            user_id: userId,
-            name: name.toLowerCase()
-        }
-    });
-
-    if (existingTag) {
-        throw new Error("Tag already exists");
-    }
-
-    await prisma.userTag.create({
-        data: {
-            name: name.toLowerCase(),
-            user_id: userId
-        }
-    });
+    await createTagInRepo(userId, name);
 
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/transactions");
@@ -63,24 +48,8 @@ export async function createTag(formData: FormData) {
 }
 
 export async function deleteTag(tagId: string) {
-    const userId = await getUserId();
-
-    // Verify the tag belongs to the current user
-    const tag = await prisma.userTag.findFirst({
-        where: {
-            id: tagId,
-            user_id: userId
-        }
-    });
-
-    if (!tag) {
-        throw new Error("Tag not found");
-    }
-
-    await prisma.userTag.delete({
-        where: { id: tagId }
-    });
-
+    const userId = await requireUserId();
+    await deleteTagInRepo(userId, tagId);
     revalidatePath("/dashboard/profile");
     revalidatePath("/dashboard/transactions");
     revalidatePath("/dashboard/recurring");

@@ -3,18 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { prisma } from "../prisma";
-import { getUserId } from "../utils";
+import { dollarsToCents } from "../currency";
+import {
+    createTransaction as createTransactionInRepo,
+    deleteTransaction as deleteTransactionInRepo,
+    updateTransaction as updateTransactionInRepo
+} from "../server/repository";
+import { requireUserId } from "../session";
 
 const TransactionSchema = z.object({
-    name: z.string(),
+    name: z.string().trim().min(1),
     amount: z.coerce.number(),
     date: z.string(),
     category: z.string().nullish()
 });
 
 export async function createTransaction(formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { name, amount, date, category } = TransactionSchema.parse({
         name: formData.get("name"),
         amount: formData.get("amount"),
@@ -22,23 +27,21 @@ export async function createTransaction(formData: FormData) {
         category: formData.get("category")
     });
 
-    await prisma.transaction.create({
-        data: {
-            user_id: userId,
-            amount,
-            category,
-            purchase_date: new Date(date),
-            name,
-            created_at: new Date()
-        }
+    await createTransactionInRepo({
+        userId,
+        amountCents: dollarsToCents(amount),
+        category: category || null,
+        purchaseDate: date,
+        name
     });
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/transactions");
     redirect("/dashboard/transactions");
 }
 
 export async function updateTransaction(id: string, formData: FormData) {
-    const userId = await getUserId();
+    const userId = await requireUserId();
     const { name, amount, date, category } = TransactionSchema.parse({
         name: formData.get("name"),
         amount: formData.get("amount"),
@@ -46,24 +49,23 @@ export async function updateTransaction(id: string, formData: FormData) {
         category: formData.get("category")
     });
 
-    await prisma.transaction.update({
-        where: { id, user_id: userId },
-        data: {
-            amount,
-            category,
-            purchase_date: new Date(date),
-            name
-        }
+    await updateTransactionInRepo({
+        id,
+        userId,
+        amountCents: dollarsToCents(amount),
+        category: category || null,
+        purchaseDate: date,
+        name
     });
 
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/transactions");
     redirect("/dashboard/transactions");
 }
 
 export async function deleteTransaction(id: string) {
-    const userId = await getUserId();
-    await prisma.transaction.delete({
-        where: { id, user_id: userId }
-    });
+    const userId = await requireUserId();
+    await deleteTransactionInRepo(userId, id);
+    revalidatePath("/dashboard");
     revalidatePath("/dashboard/transactions");
 }

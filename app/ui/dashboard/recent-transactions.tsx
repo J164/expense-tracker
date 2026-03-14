@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { lusitana } from "./fonts";
 import Link from "next/link";
 import { fetchRecentTransactions } from "@/app/lib/data";
+import { formatCents } from "@/app/lib/currency";
 
 export default async function RecentTransactions() {
     const transactions = await fetchRecentTransactions();
@@ -38,7 +39,7 @@ export default async function RecentTransactions() {
                                 <p
                                     className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
                                 >
-                                    ${transaction.amount.toFixed(2)}
+                                    ${formatCents(transaction.amountCents)}
                                 </p>
                             </div>
                         );

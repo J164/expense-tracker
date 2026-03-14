@@ -1,4 +1,15 @@
-import { Decimal } from "@prisma/client/runtime/library";
+export type RecurrenceFrequency = "MONTHLY" | "YEARLY";
+
+export type TransactionRecord = {
+    id: string;
+    userId: string;
+    name: string;
+    amountCents: number;
+    purchaseDate: string;
+    createdAt: string;
+    category: string | null;
+    recurringTransactionId: string | null;
+};
 
 export type FormatTransaction = {
     id: string;
@@ -10,14 +21,34 @@ export type FormatTransaction = {
 };
 
 export type ProfileData = {
-    monthly_budget: Decimal;
+    monthlyBudgetCents: number;
 };
 
 export type FormatProfile = {
     monthly_budget: string;
 };
 
-export type RecurrenceFrequency = "MONTHLY" | "YEARLY";
+export type CardData = {
+    totalSpentCents: number;
+    budgetCents: number;
+    regularTransactionsCents: number;
+    recurringImpactCents: number;
+};
+
+export type RecurringTransactionData = {
+    id: string;
+    userId: string;
+    name: string;
+    amountCents: number;
+    category: string | null;
+    frequency: RecurrenceFrequency;
+    startDate: string;
+    endDate: string | null;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    lastGenerated: string | null;
+};
 
 export type FormatRecurringTransaction = {
     id: string;
@@ -32,22 +63,27 @@ export type FormatRecurringTransaction = {
     last_generated: string | null;
 };
 
-export type RecurringTransactionData = {
-    id: string;
-    name: string;
-    amount: Decimal;
-    category: string | null;
-    frequency: RecurrenceFrequency;
-    start_date: Date;
-    end_date: Date | null;
-    is_active: boolean;
-    created_at: Date;
-    last_generated: Date | null;
-};
-
 export type UserTag = {
     id: string;
     name: string;
-    user_id: string;
-    created_at: Date;
+    userId: string;
+    createdAt: string;
+};
+
+export type UserRecord = {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+    providerAccountId: string | null;
+    monthlyBudgetCents: number;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type UserUpsertInput = {
+    email: string;
+    name?: string | null;
+    image?: string | null;
+    providerAccountId?: string | null;
 };

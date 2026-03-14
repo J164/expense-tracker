@@ -1,0 +1,31 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "main": ".open-next/worker.js",
+    "name": "expense-tracker",
+    "compatibility_date": "2026-03-14",
+    "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+    "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+    },
+    "services": [
+        {
+            "binding": "WORKER_SELF_REFERENCE",
+            "service": "expense-tracker"
+        }
+    ],
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "expense-tracker",
+            "database_id": "67d112d3-5ce3-46fe-b10f-0bb54ff9dadb",
+            "migrations_dir": "drizzle"
+        }
+    ],
+    "vars": {
+        "AUTH_ENABLE_TEST_PROVIDER": "false"
+    },
+    "observability": {
+        "enabled": true
+    }
+}

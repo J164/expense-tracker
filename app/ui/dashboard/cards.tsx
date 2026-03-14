@@ -3,6 +3,7 @@ import { lusitana } from "./fonts";
 import { fetchCardData } from "@/app/lib/data";
 import UpdateBudget from "./update-budget";
 import Link from "next/link";
+import { formatCents } from "@/app/lib/currency";
 
 export function Card({
     title,
@@ -32,35 +33,41 @@ export function Card({
 }
 
 export default async function CardWrapper() {
-    const { total_spent, budget, regular_transactions, recurring_impact } =
-        await fetchCardData();
+    const {
+        totalSpentCents,
+        budgetCents,
+        regularTransactionsCents,
+        recurringImpactCents
+    } = await fetchCardData();
 
     return (
         <>
             <Card
                 title="Remaining Budget"
                 showBudgetUpdate={true}
-                budget={budget.toFixed(2)}
+                budget={formatCents(budgetCents)}
             >
                 <div className="rounded-xl bg-white px-4 py-8">
                     <p
                         className={`${lusitana.className} truncate text-center text-2xl`}
                     >
-                        {`$${budget.minus(total_spent).toFixed(2)}`}{" "}
-                        <span className="text-gray-500">{`/ $${budget.toFixed(2)}`}</span>
+                        {`$${formatCents(budgetCents - totalSpentCents)}`}{" "}
+                        <span className="text-gray-500">{`/ $${formatCents(budgetCents)}`}</span>
                     </p>
                     <div className="mt-4 space-y-2 text-sm text-gray-600">
                         <div className="flex justify-between">
                             <span>Regular Transactions:</span>
-                            <span>${regular_transactions.toFixed(2)}</span>
+                            <span>
+                                ${formatCents(regularTransactionsCents)}
+                            </span>
                         </div>
                         <div className="flex justify-between">
                             <span>Recurring (Monthly Impact):</span>
-                            <span>${recurring_impact.toFixed(2)}</span>
+                            <span>${formatCents(recurringImpactCents)}</span>
                         </div>
                         <div className="flex justify-between border-t pt-2 font-medium">
                             <span>Total Spent:</span>
-                            <span>${total_spent.toFixed(2)}</span>
+                            <span>${formatCents(totalSpentCents)}</span>
                         </div>
                     </div>
                 </div>
@@ -76,7 +83,7 @@ export default async function CardWrapper() {
                     <p
                         className={`${lusitana.className} truncate text-center text-2xl`}
                     >
-                        ${recurring_impact.toFixed(2)}
+                        ${formatCents(recurringImpactCents)}
                         <span className="text-sm text-gray-500 block mt-1">
                             monthly impact
                         </span>
