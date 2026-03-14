@@ -97,6 +97,67 @@ describe("auth callbacks", () => {
         expect(session.user.id).toBe("");
     });
 
+    it("falls back to an existing user when persisting sign-in fails", async () => {
+        const error = new Error("write failed");
+        const consoleError = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => undefined);
+
+        vi.spyOn(repository, "upsertUser").mockRejectedValue(error);
+        vi.spyOn(repository, "getUserByEmail").mockResolvedValue({
+            id: "user-3",
+            email: "demo@example.com",
+            name: "Demo",
+            image: null,
+            providerAccountId: "google-1",
+            monthlyBudgetCents: 0,
+            createdAt: "2026-03-14T00:00:00.000Z",
+            updatedAt: "2026-03-14T00:00:00.000Z"
+        });
+
+        const user = {
+            id: "",
+            email: "demo@example.com",
+            name: "Demo",
+            image: null
+        } as User;
+
+        await expect(handleAuthSignIn({ user })).resolves.toBe(true);
+        expect(user.id).toBe("user-3");
+        expect(consoleError).toHaveBeenCalled();
+    });
+
+    it("rethrows sign-in persistence errors when no fallback user exists", async () => {
+        const error = new Error("write failed");
+        vi.spyOn(console, "error").mockImplementation(() => undefined);
+        vi.spyOn(repository, "upsertUser").mockRejectedValue(error);
+        vi.spyOn(repository, "getUserByEmail").mockResolvedValue(null);
+
+        await expect(
+            handleAuthSignIn({
+                user: {
+                    id: "",
+                    email: "demo@example.com",
+                    name: "Demo",
+                    image: null
+                } as User
+            })
+        ).rejects.toThrow("write failed");
+    });
+
+    it("returns the token unchanged when token hydration lookup fails", async () => {
+        vi.spyOn(console, "error").mockImplementation(() => undefined);
+        vi.spyOn(repository, "getUserByEmail").mockRejectedValue(
+            new Error("lookup failed")
+        );
+
+        const token = await hydrateTokenUserId({
+            email: "demo@example.com"
+        } as JWT);
+
+        expect(token.id).toBeUndefined();
+    });
+
     it("attaches the database user id to the session", () => {
         const session = attachSessionUserId(
             { user: { id: "", email: "demo@example.com" } } as Session,
